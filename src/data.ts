@@ -24,8 +24,8 @@ export const account = {
   name: "FlexAccount",
   sortCode: "07-09-76",
   number: "01299995",
-  balance: 3589.38,
-  available: 3589.38,
+  balance: 4896,
+  available: 4896,
 };
 
 export const transactionGroups: TransactionGroup[] = [
