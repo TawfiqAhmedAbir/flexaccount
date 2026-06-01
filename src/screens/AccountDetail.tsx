@@ -1,10 +1,18 @@
+import { useLayoutEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import PhoneFrame from "../components/PhoneFrame";
 import TabBar from "../components/TabBar";
 import MerchantBadge from "../components/MerchantBadge";
-import { account, transactionGroups } from "../data";
-import { formatGBP, signedGBP } from "../format";
+import { account, transactions } from "../data";
+import type { Transaction } from "../data";
+import {
+  formatGBP,
+  formatGroupDate,
+  formatMonthLabel,
+  monthKey,
+  signedGBP,
+} from "../format";
 import { slideScreen } from "../motion";
 import {
   InfoIcon,
@@ -21,8 +29,48 @@ const actions = [
   { label: "More options", Icon: MoreIcon },
 ];
 
+interface Group {
+  key: string;
+  label: string;
+  date?: string;
+  balance?: number;
+  items: Transaction[];
+}
+
+function buildGroups(): Group[] {
+  const groups: Group[] = [];
+  for (const txn of transactions) {
+    const isPending = txn.status === "pending";
+    const key = isPending ? "pending" : txn.date;
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.items.push(txn);
+      continue;
+    }
+    groups.push({
+      key,
+      label: isPending ? "Pending" : formatGroupDate(txn.date),
+      date: isPending ? undefined : txn.date,
+      balance: isPending ? undefined : txn.balanceAfter,
+      items: [txn],
+    });
+  }
+  return groups;
+}
+
+// Preserve the list's scroll position across navigation to a transaction.
+let savedScroll = 0;
+
 export default function AccountDetail() {
   const navigate = useNavigate();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const groups = buildGroups();
+
+  useLayoutEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = savedScroll;
+  }, []);
+
+  let prevMonth: string | undefined;
 
   return (
     <PhoneFrame>
@@ -49,7 +97,11 @@ export default function AccountDetail() {
           <span className="justify-self-end" />
         </div>
 
-        <div className="no-scrollbar flex-1 overflow-y-auto px-4 pb-28">
+        <div
+          ref={scrollRef}
+          onScroll={(e) => (savedScroll = e.currentTarget.scrollTop)}
+          className="no-scrollbar flex-1 overflow-y-auto px-4 pb-28"
+        >
           {/* Balance card */}
           <div className="relative mb-5 mt-1 rounded-card bg-card px-5 py-5">
             <button
@@ -92,52 +144,63 @@ export default function AccountDetail() {
           </div>
 
           {/* Groups */}
-          {transactionGroups.map((group) => (
-            <div key={group.label}>
-              {group.dividerBefore && (
-                <div className="my-3 flex items-center gap-3 px-1">
-                  <span className="text-[13px] font-medium text-muted">
-                    {group.dividerBefore}
-                  </span>
-                  <span className="h-px flex-1 bg-white/10" />
-                </div>
-              )}
+          {groups.map((group) => {
+            const showDivider =
+              group.date !== undefined &&
+              prevMonth !== undefined &&
+              monthKey(group.date) !== prevMonth;
+            if (group.date) prevMonth = monthKey(group.date);
 
-              <div className="mt-4 flex items-center justify-between px-1">
-                <span className="text-[15px] font-semibold text-white">{group.label}</span>
-                {group.runningBalance !== undefined && (
-                  <span className="text-[14px] font-medium text-muted">
-                    {formatGBP(group.runningBalance)}
-                  </span>
-                )}
-              </div>
-
-              <div className="mt-2 overflow-hidden rounded-card bg-panel">
-                {group.items.map((txn, idx) => (
-                  <div key={`${group.label}-${idx}`}>
-                    {idx > 0 && <div className="ml-[68px] h-px bg-white/10" />}
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
-                    >
-                      <MerchantBadge badge={txn.badge} />
-                      <span className="flex-1 truncate text-[15px] text-white">
-                        {txn.merchant}
-                      </span>
-                      <span
-                        className={`text-[15px] font-bold ${
-                          txn.type === "credit" ? "text-credit" : "text-white"
-                        }`}
-                      >
-                        {signedGBP(txn.amount, txn.type)}
-                      </span>
-                      <ChevronRight size={18} className="text-muted" />
-                    </button>
+            return (
+              <div key={group.key}>
+                {showDivider && (
+                  <div className="my-3 flex items-center gap-3 px-1">
+                    <span className="text-[13px] font-medium text-muted">
+                      {formatMonthLabel(group.date!)}
+                    </span>
+                    <span className="h-px flex-1 bg-white/10" />
                   </div>
-                ))}
+                )}
+
+                <div className="mt-4 flex items-center justify-between px-1">
+                  <span className="text-[15px] font-semibold text-white">
+                    {group.label}
+                  </span>
+                  {group.balance !== undefined && (
+                    <span className="text-[14px] font-medium text-muted">
+                      {formatGBP(group.balance)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-2 overflow-hidden rounded-card bg-panel">
+                  {group.items.map((txn, idx) => (
+                    <div key={txn.id}>
+                      {idx > 0 && <div className="ml-[68px] h-px bg-white/10" />}
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/transaction/${txn.id}`)}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
+                      >
+                        <MerchantBadge badge={txn.badge} />
+                        <span className="flex-1 truncate text-[15px] text-white">
+                          {txn.merchant}
+                        </span>
+                        <span
+                          className={`text-[15px] font-bold ${
+                            txn.type === "credit" ? "text-credit" : "text-white"
+                          }`}
+                        >
+                          {signedGBP(txn.amount, txn.type)}
+                        </span>
+                        <ChevronRight size={18} className="text-muted" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <TabBar />
