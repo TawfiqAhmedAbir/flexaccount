@@ -24,9 +24,9 @@ import {
 } from "../components/icons";
 
 const actions = [
-  { label: "Pay or move money", Icon: SwapIcon },
-  { label: "Manage cards", Icon: CardIcon },
-  { label: "More options", Icon: MoreIcon },
+  { label: "Pay or move money", Icon: SwapIcon, to: "/payee" },
+  { label: "Manage cards", Icon: CardIcon, to: "/cards" },
+  { label: "More options", Icon: MoreIcon, to: "/more-options" },
 ];
 
 interface Group {
@@ -122,6 +122,7 @@ export default function AccountDetail() {
             {actions.map((a) => (
               <button
                 key={a.label}
+                onClick={() => navigate(a.to)}
                 type="button"
                 className="flex w-[88px] flex-col items-center gap-2"
               >
