@@ -1,4 +1,16 @@
-import { transactions, account } from "../src/data.ts";
+import { readFile } from "node:fs/promises";
+import ts from "typescript";
+
+const source = await readFile(new URL("../src/data.ts", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, {
+  compilerOptions: {
+    module: ts.ModuleKind.ES2020,
+    target: ts.ScriptTarget.ES2020,
+  },
+});
+const { transactions, account } = await import(
+  `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
+);
 
 const expected = {
   "2026-06-16": 745.7,
@@ -88,6 +100,7 @@ const expected = {
   "2026-02-04": 567.79,
   "2026-02-01": 579.93,
 };
+const expectedAccountBalance = 745.7;
 
 // First (newest) transaction per date carries that day's closing balance.
 const firstByDate = {};
@@ -108,6 +121,10 @@ for (const [date, exp] of Object.entries(expected)) {
 const cleared = transactions.filter((t) => t.status !== "pending");
 console.log(`cleared transactions: ${cleared.length}`);
 console.log(`account.balance: ${account.balance}`);
+if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
+  failures++;
+  console.log(`MISMATCH account.balance: expected ${expectedAccountBalance} got ${account.balance}`);
+}
 
 // Spot-check LSBU tuition
 const lsbu = transactions.find((t) => t.merchant === "London South Bank Univers");
