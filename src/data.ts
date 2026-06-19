@@ -55,8 +55,8 @@ export const account = {
   name: "FlexAccount",
   sortCode: "07-09-76",
   number: "01299995",
-  balance: 796.0,
-  available: 796.0,
+  balance: 745.7,
+  available: 745.7,
 };
 
 // Account opening balance brought forward on 1 Feb 2026.
@@ -280,6 +280,12 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // [date, merchant, amount] — newest first, cleared transactions only.
 // Within a day, listed newest-first (top = latest that day).
 const rawCleared: [string, string, number][] = [
+  ["2026-06-16", "TFL - Transport for London", -7.8],
+  ["2026-06-15", "Cursor", -20.0],
+  ["2026-06-14", "TFL - Transport for London", -6.0],
+  ["2026-06-13", "Dagenham Halal Supermarket", -3.9],
+  ["2026-06-12", "Dagenham Corner", -4.8],
+  ["2026-06-10", "TFL - Transport for London", -7.8],
   ["2026-06-01", "London South Bank Univers", -4100.0],
   ["2026-05-30", "Bank credit J SAINSBURYS PLC 5750742-1", 860.0],
   ["2026-05-28", "Dixy Chicken", -5.99],
