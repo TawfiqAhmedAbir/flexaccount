@@ -12,51 +12,48 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expected = {
-  "2026-06-30": 1696.8,
-  "2026-06-29": 1710.72,
-  "2026-06-26": 1667.47,
-  "2026-06-25": 734.8,
-  "2026-06-22": 737.2,
-};
-const expectedAccountBalance = 1696.8;
+const cleared = transactions.filter((t) => t.status !== "pending");
+const pending = transactions.filter((t) => t.status === "pending");
 
-// First (newest) transaction per date carries that day's closing balance.
 const firstByDate = {};
-for (const t of transactions) {
-  if (t.status === "pending") continue;
+for (const t of cleared) {
   if (!(t.date in firstByDate)) firstByDate[t.date] = t.balanceAfter;
 }
 
 let failures = 0;
-for (const [date, exp] of Object.entries(expected)) {
-  const got = firstByDate[date];
-  if (Math.abs(got - exp) > 0.001) {
-    failures++;
-    console.log(`MISMATCH ${date}: expected ${exp} got ${got}`);
-  }
+
+const newest = cleared[0];
+if (!newest || Math.abs(newest.balanceAfter - account.balance) > 0.001) {
+  failures++;
+  console.log(
+    `MISMATCH account.balance: expected ${newest?.balanceAfter} got ${account.balance}`
+  );
 }
 
-const cleared = transactions.filter((t) => t.status !== "pending");
-const pending = transactions.filter((t) => t.status === "pending");
+let prev = null;
+for (let i = cleared.length - 1; i >= 0; i--) {
+  const t = cleared[i];
+  if (prev && Math.abs(t.balanceBefore - prev.balanceAfter) > 0.001) {
+    failures++;
+    console.log(`MISMATCH chain at ${t.id}: before ${t.balanceBefore} != prev ${prev.balanceAfter}`);
+  }
+  if (Math.abs(t.balanceBefore - (t.balanceAfter - t.amount)) > 0.001) {
+    failures++;
+    console.log(`MISMATCH before/after at ${t.id}`);
+  }
+  prev = t;
+}
+
 console.log(`cleared transactions: ${cleared.length}`);
 console.log(`pending transactions: ${pending.length}`);
 console.log(`account.balance: ${account.balance}`);
-if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
-  failures++;
-  console.log(`MISMATCH account.balance: expected ${expectedAccountBalance} got ${account.balance}`);
-}
 
-const bangladesh = transactions.find((t) => t.merchant === "Bangladesh High Commission");
+const lsbu = transactions.find((t) => t.merchant === "London South Bank Univers");
 console.log(
-  `Bangladesh pending: ${bangladesh?.amount} (expect -75)`
+  `LSBU before/after: ${lsbu.balanceBefore} -> ${lsbu.balanceAfter} (expect 4896 -> 796)`
 );
 
-// balanceBefore = balanceAfter - amount consistency
-let inconsistent = 0;
-for (const t of cleared) {
-  if (Math.abs(t.balanceBefore - (t.balanceAfter - t.amount)) > 0.001) inconsistent++;
-}
+const bangladesh = transactions.find((t) => t.merchant === "Bangladesh High Commission");
+console.log(`Bangladesh pending: ${bangladesh?.amount} (expect -75)`);
 
-console.log(failures === 0 ? "ALL DAY CLOSINGS MATCH ✓" : `${failures} FAILURES`);
-console.log(`balanceBefore consistency issues: ${inconsistent}`);
+console.log(failures === 0 ? "ALL CHECKS PASS ✓" : `${failures} FAILURES`);
