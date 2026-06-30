@@ -55,8 +55,8 @@ export const account = {
   name: "FlexAccount",
   sortCode: "07-09-76",
   number: "01299995",
-  balance: 745.7,
-  available: 745.7,
+  balance: 1696.8,
+  available: 1696.8,
 };
 
 // Account opening balance brought forward on 1 Feb 2026.
@@ -68,6 +68,8 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 const categoryByMerchant: Record<string, Category> = {
   "London South Bank Univers": "tuition",
   "Bank credit J SAINSBURYS PLC 5750742-1": "salary",
+  "Bank credit MR M A BATEN": "transfer",
+  "Bangladesh High Commission": "transfer",
   "Tawfiq Ahmed Abir via Revolut": "transfer",
   Grok: "subscription",
   Cursor: "subscription",
@@ -80,6 +82,7 @@ const categoryByMerchant: Record<string, Category> = {
   "Sainsbury's": "grocery",
   "Apple / iTunes": "digital",
   "Dixy Chicken": "food",
+  "Top Dixie Chicken": "food",
   "Sam's Chicken": "food",
   "Chick King": "food",
   "Chicken Cottage": "food",
@@ -115,6 +118,12 @@ function badgeFor(merchant: string): Badge {
   switch (merchant) {
     case "TFL - Transport for London":
       return { kind: "tfl" };
+    case "Bangladesh High Commission":
+      return { kind: "initial", letter: "B", color: "#006A4E" };
+    case "Top Dixie Chicken":
+      return { kind: "initial", letter: "T", color: "#D4202A" };
+    case "Prime | Premier Stores":
+      return { kind: "initial", letter: "P", color: "#8B1E3F" };
     case "Uber":
       return { kind: "uberBlack" };
     case "Uber Eats":
@@ -275,11 +284,37 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     website: "www.bims-store.co.uk",
     cardDescriptor: "BIMS / DEPTFORD / GB / CONTACTLESS / 4471",
   },
+  "Bangladesh High Commission": {
+    location: "28 Queen's Gate, London SW7 5JA, UK",
+    phone: "+44 20 7584 0081",
+    website: "www.bhclondon.org.uk",
+    cardDescriptor: "BANGLADESH HIGH COMM / LONDON / GB / CONTACTLESS / 7501",
+  },
+  "Top Dixie Chicken": {
+    location: "129 Rushey Green, Catford, London SE6 4AA, UK",
+    phone: "+44 20 8690 4455",
+    website: "www.dixychicken.co.uk",
+    cardDescriptor: "TOP DIXIE CHICKEN / CATFORD / GB / CONTACTLESS / 3390",
+  },
+  "Prime | Premier Stores": {
+    location: "45 High St, London SE20 7HJ, UK",
+    phone: "+44 20 8778 1234",
+    website: "www.premier-stores.co.uk",
+    cardDescriptor: "PRIME PREMIER / LONDON / GB / CONTACTLESS / 8812",
+  },
 };
 
 // [date, merchant, amount] — newest first, cleared transactions only.
 // Within a day, listed newest-first (top = latest that day).
 const rawCleared: [string, string, number][] = [
+  ["2026-06-30", "Prime | Premier Stores", -6.27],
+  ["2026-06-30", "TFL - Transport for London", -7.65],
+  ["2026-06-29", "TFL - Transport for London", -6.75],
+  ["2026-06-29", "Bank credit MR M A BATEN", 50.0],
+  ["2026-06-26", "Prime | Premier Stores", -6.0],
+  ["2026-06-26", "Bank credit J SAINSBURYS PLC 5750742-1", 938.67],
+  ["2026-06-25", "Top Dixie Chicken", -2.4],
+  ["2026-06-22", "TFL - Transport for London", -8.5],
   ["2026-06-16", "TFL - Transport for London", -7.8],
   ["2026-06-15", "Cursor", -20.0],
   ["2026-06-14", "TFL - Transport for London", -6.0],
@@ -439,10 +474,10 @@ const clearedNewest = [...clearedChrono].reverse();
 // A single pending item (does not affect cleared balances), matching the app's
 // "Pending" group + pending-detail screen.
 const pendingTxn = buildTransaction(
-  "pending-tfl-travel",
-  "2026-06-01",
-  "TfL Travel Charge",
-  -11.75,
+  "pending-bangladesh",
+  "2026-06-30",
+  "Bangladesh High Commission",
+  -75.0,
   "pending",
   account.balance
 );
