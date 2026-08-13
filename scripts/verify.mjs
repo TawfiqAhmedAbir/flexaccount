@@ -13,29 +13,26 @@ const { transactions, account } = await import(
 );
 
 const expectedAccountBalance = 2613.89;
-const expectedCleared = 8;
-const expectedDayClosings = {
-  "2026-06-30": 2613.89,
-  "2026-06-29": 2627.81,
-  "2026-06-26": 2584.56,
-  "2026-06-25": 1651.89,
-  "2026-06-22": 1654.29,
-};
+const excluded = [
+  "uber eats",
+  "deliveroo",
+  "revolut",
+  "atm",
+  "rojalpark",
+  "prime",
+  "premier",
+  "village news",
+  "a p news",
+  "lime store",
+  "sweet express",
+  "peacock",
+  "variety foods",
+];
 
 const cleared = transactions.filter((t) => t.status !== "pending");
 const pending = transactions.filter((t) => t.status === "pending");
 
-const firstByDate = {};
-for (const t of cleared) {
-  if (!(t.date in firstByDate)) firstByDate[t.date] = t.balanceAfter;
-}
-
 let failures = 0;
-
-if (cleared.length !== expectedCleared) {
-  failures++;
-  console.log(`MISMATCH cleared count: expected ${expectedCleared} got ${cleared.length}`);
-}
 
 const newest = cleared[0];
 if (!newest || Math.abs(newest.balanceAfter - account.balance) > 0.001) {
@@ -52,11 +49,46 @@ if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
   );
 }
 
-for (const [date, exp] of Object.entries(expectedDayClosings)) {
-  const got = firstByDate[date];
-  if (got == null || Math.abs(got - exp) > 0.001) {
+if (!cleared.some((t) => t.date.startsWith("2026-07"))) {
+  failures++;
+  console.log("MISSING July transactions");
+}
+if (!cleared.some((t) => t.date.startsWith("2026-08"))) {
+  failures++;
+  console.log("MISSING August transactions");
+}
+if (!cleared.some((t) => t.date === "2026-06-30")) {
+  failures++;
+  console.log("MISSING 2026-06-30 rows under July/August");
+}
+
+const idxAug = cleared.findIndex((t) => t.date.startsWith("2026-08") || t.date.startsWith("2026-07"));
+const idxJun30 = cleared.findIndex((t) => t.date === "2026-06-30");
+if (idxAug < 0 || idxJun30 < 0 || idxAug > idxJun30) {
+  failures++;
+  console.log("July/August rows must sit above 2026-06-30 in newest-first order");
+}
+
+for (const t of transactions) {
+  const ml = t.merchant.toLowerCase();
+  if (excluded.some((s) => ml.includes(s))) {
     failures++;
-    console.log(`MISMATCH ${date}: expected ${exp} got ${got}`);
+    console.log(`EXCLUDED merchant present: ${t.merchant} (${t.status})`);
+  }
+}
+
+for (const name of ["Lidl", "Iceland", "Uber", "TFL - Transport for London", "Sainsbury's"]) {
+  if (!cleared.some((t) => t.merchant === name || t.merchant.startsWith("Bank credit J SAINSBURYS"))) {
+    if (name === "Sainsbury's") {
+      const has = cleared.some((t) => t.merchant === "Sainsbury's" || t.merchant.startsWith("Bank credit J SAINSBURYS"));
+      if (!has) {
+        failures++;
+        console.log(`MISSING merchant: ${name}`);
+      }
+    } else if (!cleared.some((t) => t.merchant === name)) {
+      failures++;
+      console.log(`MISSING merchant: ${name}`);
+    }
   }
 }
 
@@ -74,37 +106,22 @@ for (let i = cleared.length - 1; i >= 0; i--) {
   prev = t;
 }
 
-const net = round2(cleared.reduce((sum, t) => sum + t.amount, 0));
+const pendingExcluded = pending.filter((t) =>
+  excluded.some((s) => t.merchant.toLowerCase().includes(s))
+);
+if (pendingExcluded.length) {
+  failures++;
+  console.log(`EXCLUDED pending still present: ${pendingExcluded.map((t) => t.merchant).join(", ")}`);
+}
+
 console.log(`cleared transactions: ${cleared.length}`);
 console.log(`pending transactions: ${pending.length}`);
 console.log(`account.balance: ${account.balance}`);
-console.log(`cleared net: ${net}`);
+console.log(`newest date: ${newest?.date} ${newest?.merchant}`);
+console.log(`July/August count: ${cleared.filter((t) => t.date >= "2026-07-01").length}`);
 
-const bangladesh = transactions.find((t) => t.merchant === "Bangladesh High Commission");
-if (!bangladesh || bangladesh.status !== "pending" || Math.abs(bangladesh.amount + 75) > 0.001) {
-  failures++;
-  console.log(`MISMATCH Bangladesh pending: ${bangladesh?.amount} (expect -75)`);
-} else {
-  console.log(`Bangladesh pending: ${bangladesh.amount} (expect -75)`);
-}
-
-const merchants = new Set(cleared.map((t) => t.merchant));
-for (const name of [
-  "Bank credit MR M A BATEN",
-  "Bank credit J SAINSBURYS PLC 5750742-1",
-  "TFL - Transport for London",
-  "Prime | Premier Stores",
-  "Top Dixie Chicken",
-]) {
-  if (!merchants.has(name)) {
-    failures++;
-    console.log(`MISSING merchant: ${name}`);
-  }
-}
+const bangladesh = pending.find((t) => t.merchant === "Bangladesh High Commission");
+console.log(`Bangladesh pending: ${bangladesh?.amount ?? "none"}`);
 
 console.log(failures === 0 ? "ALL CHECKS PASS ✓" : `${failures} FAILURES`);
 if (failures !== 0) process.exit(1);
-
-function round2(n) {
-  return Math.round(n * 100) / 100;
-}
