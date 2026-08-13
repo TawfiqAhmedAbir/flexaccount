@@ -12,22 +12,24 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 3063.89;
+const expectedAccountBalance = 2730.19;
 const excluded = [
   "uber",
   "deliveroo",
   "revolut",
   "atm",
   "cash withdrawal",
-  "rojalpark",
-  "prime",
-  "premier",
+  "notemachine",
+  "eats & bits",
+  "waller chemist",
+  "clearpay",
   "village news",
   "a p news",
   "lime store",
   "sweet express",
   "peacock",
   "variety foods",
+  "heathway mobil",
   "greenlane",
   "best one",
   "nisa",
@@ -69,10 +71,31 @@ if (!bangladesh || bangladesh.date !== "2026-07-01" || Math.abs(bangladesh.amoun
   );
 }
 
-const nazneen = cleared.find((t) => t.merchant.toLowerCase().includes("nazneen"));
-if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001) {
+const nazneen = cleared.find((t) => t.merchant === "Bank credit NAZNEEN Q 15");
+if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026-08-12") {
   failures++;
-  console.log("MISSING/WRONG Nazneen bank credit (expected +500)");
+  console.log("MISSING/WRONG Nazneen bank credit (expected +500 on 2026-08-12)");
+}
+
+if (
+  !newest ||
+  newest.date !== "2026-08-13" ||
+  newest.merchant !== "TFL - Transport for London" ||
+  Math.abs(newest.amount + 1.75) > 0.001
+) {
+  failures++;
+  console.log(`WRONG newest row: expected TFL -1.75 on 2026-08-13, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+}
+
+const convenienceJulAug = cleared.filter(
+  (t) =>
+    t.date >= "2026-07-01" &&
+    (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
+);
+const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
+if (Math.abs(convenienceTotal + 99.82) > 0.001) {
+  failures++;
+  console.log(`WRONG convenience total: expected -99.82 got ${convenienceTotal.toFixed(2)}`);
 }
 
 for (const t of transactions) {

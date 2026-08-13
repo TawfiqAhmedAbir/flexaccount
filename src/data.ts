@@ -61,16 +61,21 @@ const categoryByMerchant: Record<string, Category> = {
   "London South Bank Univers": "tuition",
   "Bank credit J SAINSBURYS PLC 5750742-1": "salary",
   "Bank credit MR M A BATEN": "transfer",
-  "Bank credit QAISER NAZNEEN": "transfer",
+  "Bank credit NAZNEEN Q 15": "transfer",
+  "QAISER NAZNEEN 20": "transfer",
   "Bangladesh High Commission": "transfer",
   Grok: "subscription",
   Cursor: "subscription",
   LuxuryTools: "subscription",
   "TFL - Transport for London": "transport",
+  "TfL - Transport for London": "transport",
   "Sainsbury's": "grocery",
   Lidl: "grocery",
   Iceland: "grocery",
   "Dagenham Halal Supermarket": "grocery",
+  "Degenham Halal Supermarke": "grocery",
+  "The Frying Spot": "food",
+  "Favourable Chicken - Square": "food",
   "Apple / iTunes": "digital",
   "Dixy Chicken": "food",
   "Top Dixie Chicken": "food",
@@ -98,7 +103,10 @@ export function variantFor(t: Transaction): "A" | "B" | "C" {
 function badgeFor(merchant: string): Badge {
   switch (merchant) {
     case "TFL - Transport for London":
+    case "TfL - Transport for London":
       return { kind: "tfl" };
+    case "Prime | Premier Stores":
+      return { kind: "initial", letter: "P", color: "#5C2D91" };
     case "Bangladesh High Commission":
       return { kind: "initial", letter: "B", color: "#006A4E" };
     case "Top Dixie Chicken":
@@ -126,6 +134,42 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     phone: "+44 343 222 1234",
     website: "tfl.gov.uk",
     cardDescriptor: "TFL TRAVEL CH / TFL.GOV.UK/CP / GB / CONTACTLESS / 4416",
+  },
+  "TfL - Transport for London": {
+    location: "Transport for London, 5 Endeavour Sq, London E20 1JN, UK",
+    phone: "+44 343 222 1234",
+    website: "tfl.gov.uk",
+    cardDescriptor: "TFL TRAVEL REFUND / TFL.GOV.UK/CP / GB / 4416",
+  },
+  "Rojalpark Express": {
+    location: "142 Royal Parade, Dagenham RM10 8DT, UK",
+    phone: "+44 20 8595 3311",
+    website: "rojalpark-express.business.site",
+    cardDescriptor: "ROJALPARK EXPRESS / DAGENHAM / GB / CONTACTLESS / 6621",
+  },
+  "Prime | Premier Stores": {
+    location: "45 Heathway, Dagenham RM9 5AL, UK",
+    phone: "+44 20 8778 1234",
+    website: "www.premier-stores.co.uk",
+    cardDescriptor: "PRIME PREMIER / DAGENHAM / GB / CONTACTLESS / 8812",
+  },
+  "Degenham Halal Supermarke": {
+    location: "184 Heathway, Dagenham RM10 8QS, UK",
+    phone: "+44 20 8593 7845",
+    website: "dagenham-halal.business.site",
+    cardDescriptor: "DEGENHAM HALAL SUPERMARKE / DAGENHAM / GB / CONTACTLESS / 5411",
+  },
+  "The Frying Spot": {
+    location: "77 Church Elm Ln, Dagenham RM10 9RR, UK",
+    phone: "+44 20 8592 6644",
+    website: "www.thefryingspot.co.uk",
+    cardDescriptor: "THE FRYING SPOT / DAGENHAM / GB / CONTACTLESS / 5812",
+  },
+  "Favourable Chicken - Square": {
+    location: "12 New Cross Rd, London SE14 5DT, UK",
+    phone: "+44 20 7732 3321",
+    website: "gosq.com",
+    cardDescriptor: "SQ *FAVOURABLE CHICKEN / gosq.com / GB / CONTACTLESS / 1180",
   },
   "Sainsbury's": {
     location: "Unit 33, Lewisham Centre, London SE13 7EP, UK",
@@ -214,33 +258,83 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 };
 
 // [date, merchant, amount] — newest first, cleared transactions only.
-// July/August filtered rows sit above the 2026-06-30 history.
-// Keeps every TfL charge, all bank credits, prominent grocers
-// (Sainsbury's, Lidl, Iceland) and food places. Excludes Uber,
-// Uber Eats, Deliveroo, Revolut withdrawals/transfers, ATM
-// withdrawals and minor convenience stores. Bangladesh High
-// Commission cleared on 1 Jul, the day after it was pending.
+// July/August rows transcribed from the real statement screenshots,
+// filtered: keeps every TfL charge (incl. the 28 Jul refund), all
+// bank credits, Sainsbury's/Lidl/Iceland, food places, non-Revolut
+// named payments, and a selection of convenience store rows
+// (~£100 total). Excludes Uber, Uber Eats, Deliveroo, Revolut
+// transfers, ATM withdrawals and the remaining convenience rows.
+// Bangladesh High Commission cleared on 1 Jul, the day after it
+// was pending.
 const rawCleared: [string, string, number][] = [
-  ["2026-08-13", "TFL - Transport for London", -7.65],
-  ["2026-08-12", "TFL - Transport for London", -6.15],
-  ["2026-08-10", "TFL - Transport for London", -5.08],
-  ["2026-08-09", "Bank credit QAISER NAZNEEN", 500.0],
-  ["2026-08-08", "Chick King", -4.99],
-  ["2026-08-07", "Lidl", -13.95],
-  ["2026-08-06", "TFL - Transport for London", -6.75],
-  ["2026-08-04", "Iceland", -8.99],
-  ["2026-08-03", "Sainsbury's", -8.2],
-  ["2026-07-31", "TFL - Transport for London", -7.8],
-  ["2026-07-31", "Bank credit J SAINSBURYS PLC 5750742-1", 938.67],
-  ["2026-07-28", "TFL - Transport for London", -6.15],
-  ["2026-07-24", "TFL - Transport for London", -6.15],
-  ["2026-07-21", "Iceland", -7.45],
-  ["2026-07-20", "TFL - Transport for London", -7.2],
-  ["2026-07-14", "Morley's", -6.5],
-  ["2026-07-10", "TFL - Transport for London", -5.08],
-  ["2026-07-08", "Dixy Chicken", -5.99],
-  ["2026-07-07", "Lidl", -9.3],
-  ["2026-07-03", "TFL - Transport for London", -6.15],
+  ["2026-08-13", "TFL - Transport for London", -1.75],
+  ["2026-08-12", "Rojalpark Express", -7.75],
+  ["2026-08-12", "TFL - Transport for London", -4.8],
+  ["2026-08-12", "Bank credit NAZNEEN Q 15", 500.0],
+  ["2026-08-11", "TFL - Transport for London", -7.6],
+  ["2026-08-10", "Sainsbury's", -9.65],
+  ["2026-08-10", "TFL - Transport for London", -6.65],
+  ["2026-08-10", "Sainsbury's", -2.35],
+  ["2026-08-10", "Sainsbury's", -2.2],
+  ["2026-08-10", "TFL - Transport for London", -6.1],
+  ["2026-08-10", "Rojalpark Express", -9.5],
+  ["2026-08-10", "Favourable Chicken - Square", -6.49],
+  ["2026-08-10", "Sainsbury's", -2.75],
+  ["2026-08-10", "Favourable Chicken - Square", -1.0],
+  ["2026-08-10", "TFL - Transport for London", -10.3],
+  ["2026-08-07", "Top Dixie Chicken", -5.99],
+  ["2026-08-06", "Top Dixie Chicken", -5.99],
+  ["2026-08-04", "Rojalpark Express", -8.5],
+  ["2026-08-03", "Sainsbury's", -7.91],
+  ["2026-08-03", "TFL - Transport for London", -6.65],
+  ["2026-08-03", "Favourable Fried Chicken", -3.0],
+  ["2026-08-03", "Sainsbury's", -11.1],
+  ["2026-08-03", "Rojalpark Express", -4.99],
+  ["2026-08-01", "Iceland", -9.15],
+  ["2026-08-01", "Rojalpark Express", -7.5],
+  ["2026-08-01", "QAISER NAZNEEN 20", -10.0],
+  ["2026-07-31", "TFL - Transport for London", -5.9],
+  ["2026-07-29", "Iceland", -13.0],
+  ["2026-07-29", "Top Dixie Chicken", -3.0],
+  ["2026-07-28", "TFL - Transport for London", -6.1],
+  ["2026-07-28", "TfL - Transport for London", 4.4],
+  ["2026-07-27", "Sainsbury's", -8.0],
+  ["2026-07-27", "Favourable Fried Chicken", -5.29],
+  ["2026-07-27", "TFL - Transport for London", -13.1],
+  ["2026-07-27", "Sainsbury's", -8.0],
+  ["2026-07-27", "Favourable Fried Chicken", -5.0],
+  ["2026-07-27", "Rojalpark Express", -9.24],
+  ["2026-07-27", "Top Dixie Chicken", -6.0],
+  ["2026-07-27", "Top Dixie Chicken", -1.0],
+  ["2026-07-24", "Rojalpark Express", -7.75],
+  ["2026-07-24", "Bank credit J SAINSBURYS PLC 5750742-1", 936.78],
+  ["2026-07-23", "Top Dixie Chicken", -10.94],
+  ["2026-07-21", "TFL - Transport for London", -8.05],
+  ["2026-07-20", "TFL - Transport for London", -9.45],
+  ["2026-07-20", "Rojalpark Express", -10.3],
+  ["2026-07-17", "Prime | Premier Stores", -4.98],
+  ["2026-07-15", "Rojalpark Express", -9.79],
+  ["2026-07-15", "TFL - Transport for London", -7.6],
+  ["2026-07-15", "Top Dixie Chicken", -6.99],
+  ["2026-07-13", "Sainsbury's", -8.0],
+  ["2026-07-13", "TFL - Transport for London", -6.65],
+  ["2026-07-13", "TFL - Transport for London", -6.75],
+  ["2026-07-11", "Lidl", -2.93],
+  ["2026-07-10", "Prime | Premier Stores", -3.38],
+  ["2026-07-10", "TFL - Transport for London", -15.3],
+  ["2026-07-09", "Sainsbury's", -8.0],
+  ["2026-07-08", "Rojalpark Express", -9.39],
+  ["2026-07-06", "TFL - Transport for London", -11.05],
+  ["2026-07-06", "Sainsbury's", -8.0],
+  ["2026-07-06", "Favourable Fried Chicken", -4.0],
+  ["2026-07-06", "Sainsbury's", -2.4],
+  ["2026-07-06", "TFL - Transport for London", -12.9],
+  ["2026-07-06", "The Frying Spot", -14.0],
+  ["2026-07-06", "Sainsbury's", -6.9],
+  ["2026-07-03", "Prime | Premier Stores", -6.75],
+  ["2026-07-03", "TFL - Transport for London", -7.0],
+  ["2026-07-02", "Degenham Halal Supermarke", -5.59],
+  ["2026-07-02", "TFL - Transport for London", -7.6],
   ["2026-07-01", "Bangladesh High Commission", -75.0],
   ["2026-06-30", "TFL - Transport for London", -7.65],
   ["2026-06-29", "Sainsbury's", -6.6],
