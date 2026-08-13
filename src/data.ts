@@ -52,7 +52,7 @@ export interface Transaction {
 }
 
 // Account opening balance brought forward on 1 Feb 2026.
-const OPENING_BALANCE = 588.0;
+const OPENING_BALANCE = 478.24;
 const INDIGO = "#2A2D6B";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -69,7 +69,6 @@ const categoryByMerchant: Record<string, Category> = {
   LuxuryTools: "subscription",
   "TFL - Transport for London": "transport",
   "TfL - Transport for London": "transport",
-  "Sainsbury's": "grocery",
   Lidl: "grocery",
   Iceland: "grocery",
   "Dagenham Halal Supermarket": "grocery",
@@ -113,8 +112,6 @@ function badgeFor(merchant: string): Badge {
       return { kind: "initial", letter: "T", color: "#D4202A" };
     case "Apple / iTunes":
       return { kind: "apple" };
-    case "Sainsbury's":
-      return { kind: "initial", letter: "S", color: "#F06C00" };
     case "Lidl":
       return { kind: "initial", letter: "L", color: "#0050AA" };
     case "Iceland":
@@ -170,12 +167,6 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     phone: "+44 20 7732 3321",
     website: "gosq.com",
     cardDescriptor: "SQ *FAVOURABLE CHICKEN / gosq.com / GB / CONTACTLESS / 1180",
-  },
-  "Sainsbury's": {
-    location: "Unit 33, Lewisham Centre, London SE13 7EP, UK",
-    phone: "+44 20 8318 3042",
-    website: "www.sainsburys.co.uk",
-    cardDescriptor: "Sainsbury's / LEWISHAM LADY / GB / APPLEPAY / 7697",
   },
   Lidl: {
     location: "104-108 High St, Lewisham, London SE13 6JG, UK",
@@ -272,23 +263,17 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-12", "TFL - Transport for London", -4.8],
   ["2026-08-12", "Bank credit NAZNEEN Q 15", 500.0],
   ["2026-08-11", "TFL - Transport for London", -7.6],
-  ["2026-08-10", "Sainsbury's", -9.65],
   ["2026-08-10", "TFL - Transport for London", -6.65],
-  ["2026-08-10", "Sainsbury's", -2.35],
-  ["2026-08-10", "Sainsbury's", -2.2],
   ["2026-08-10", "TFL - Transport for London", -6.1],
   ["2026-08-10", "Rojalpark Express", -9.5],
   ["2026-08-10", "Favourable Chicken - Square", -6.49],
-  ["2026-08-10", "Sainsbury's", -2.75],
   ["2026-08-10", "Favourable Chicken - Square", -1.0],
   ["2026-08-10", "TFL - Transport for London", -10.3],
   ["2026-08-07", "Top Dixie Chicken", -5.99],
   ["2026-08-06", "Top Dixie Chicken", -5.99],
   ["2026-08-04", "Rojalpark Express", -8.5],
-  ["2026-08-03", "Sainsbury's", -7.91],
   ["2026-08-03", "TFL - Transport for London", -6.65],
   ["2026-08-03", "Favourable Fried Chicken", -3.0],
-  ["2026-08-03", "Sainsbury's", -11.1],
   ["2026-08-03", "Rojalpark Express", -4.99],
   ["2026-08-01", "Iceland", -9.15],
   ["2026-08-01", "Rojalpark Express", -7.5],
@@ -298,10 +283,8 @@ const rawCleared: [string, string, number][] = [
   ["2026-07-29", "Top Dixie Chicken", -3.0],
   ["2026-07-28", "TFL - Transport for London", -6.1],
   ["2026-07-28", "TfL - Transport for London", 4.4],
-  ["2026-07-27", "Sainsbury's", -8.0],
   ["2026-07-27", "Favourable Fried Chicken", -5.29],
   ["2026-07-27", "TFL - Transport for London", -13.1],
-  ["2026-07-27", "Sainsbury's", -8.0],
   ["2026-07-27", "Favourable Fried Chicken", -5.0],
   ["2026-07-27", "Rojalpark Express", -9.24],
   ["2026-07-27", "Top Dixie Chicken", -6.0],
@@ -316,29 +299,22 @@ const rawCleared: [string, string, number][] = [
   ["2026-07-15", "Rojalpark Express", -9.79],
   ["2026-07-15", "TFL - Transport for London", -7.6],
   ["2026-07-15", "Top Dixie Chicken", -6.99],
-  ["2026-07-13", "Sainsbury's", -8.0],
   ["2026-07-13", "TFL - Transport for London", -6.65],
   ["2026-07-13", "TFL - Transport for London", -6.75],
   ["2026-07-11", "Lidl", -2.93],
   ["2026-07-10", "Prime | Premier Stores", -3.38],
   ["2026-07-10", "TFL - Transport for London", -15.3],
-  ["2026-07-09", "Sainsbury's", -8.0],
   ["2026-07-08", "Rojalpark Express", -9.39],
   ["2026-07-06", "TFL - Transport for London", -11.05],
-  ["2026-07-06", "Sainsbury's", -8.0],
   ["2026-07-06", "Favourable Fried Chicken", -4.0],
-  ["2026-07-06", "Sainsbury's", -2.4],
   ["2026-07-06", "TFL - Transport for London", -12.9],
   ["2026-07-06", "The Frying Spot", -14.0],
-  ["2026-07-06", "Sainsbury's", -6.9],
   ["2026-07-03", "Prime | Premier Stores", -6.75],
   ["2026-07-03", "TFL - Transport for London", -7.0],
   ["2026-07-02", "Degenham Halal Supermarke", -5.59],
   ["2026-07-02", "TFL - Transport for London", -7.6],
   ["2026-07-01", "Bangladesh High Commission", -75.0],
   ["2026-06-30", "TFL - Transport for London", -7.65],
-  ["2026-06-29", "Sainsbury's", -6.6],
-  ["2026-06-29", "Sainsbury's", -5.5],
   ["2026-06-29", "TFL - Transport for London", -6.75],
   ["2026-06-29", "Bank credit MR M A BATEN", 50.0],
   ["2026-06-26", "Bank credit J SAINSBURYS PLC 5750742-1", 938.67],
@@ -380,7 +356,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-04-22", "TFL - Transport for London", -5.08],
   ["2026-04-20", "LuxuryTools", -25.0],
   ["2026-04-19", "TFL - Transport for London", -6.15],
-  ["2026-04-18", "Sainsbury's", -12.4],
   ["2026-04-18", "TFL - Transport for London", -4.58],
   ["2026-04-16", "TFL - Transport for London", -5.08],
   ["2026-04-15", "Apple / iTunes", -0.99],

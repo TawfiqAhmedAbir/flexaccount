@@ -112,11 +112,17 @@ if (credits.length < 8) {
   console.log(`TOO FEW credits: ${credits.length}`);
 }
 
-for (const name of ["Lidl", "Iceland", "Sainsbury's", "TFL - Transport for London"]) {
+for (const name of ["Lidl", "Iceland", "TFL - Transport for London"]) {
   if (!cleared.some((t) => t.merchant === name)) {
     failures++;
     console.log(`MISSING merchant: ${name}`);
   }
+}
+
+const sainsburys = cleared.filter((t) => t.merchant === "Sainsbury's");
+if (sainsburys.length !== 0) {
+  failures++;
+  console.log(`UNEXPECTED Sainsbury's rows: ${sainsburys.length}`);
 }
 
 const idxJulAug = cleared.findIndex((t) => t.date >= "2026-07-01");
