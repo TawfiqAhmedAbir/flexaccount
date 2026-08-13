@@ -14,10 +14,11 @@ const { transactions, account } = await import(
 
 const expectedAccountBalance = 2613.89;
 const excluded = [
-  "uber eats",
+  "uber",
   "deliveroo",
   "revolut",
   "atm",
+  "cash withdrawal",
   "rojalpark",
   "prime",
   "premier",
@@ -27,6 +28,12 @@ const excluded = [
   "sweet express",
   "peacock",
   "variety foods",
+  "greenlane",
+  "best one",
+  "nisa",
+  "londis",
+  "costcutter",
+  "bim's",
 ];
 
 const cleared = transactions.filter((t) => t.status !== "pending");
@@ -49,47 +56,51 @@ if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
   );
 }
 
-if (!cleared.some((t) => t.date.startsWith("2026-07"))) {
+if (pending.length !== 0) {
   failures++;
-  console.log("MISSING July transactions");
-}
-if (!cleared.some((t) => t.date.startsWith("2026-08"))) {
-  failures++;
-  console.log("MISSING August transactions");
-}
-if (!cleared.some((t) => t.date === "2026-06-30")) {
-  failures++;
-  console.log("MISSING 2026-06-30 rows under July/August");
+  console.log(`UNEXPECTED pending rows: ${pending.map((t) => t.merchant).join(", ")}`);
 }
 
-const idxAug = cleared.findIndex((t) => t.date.startsWith("2026-08") || t.date.startsWith("2026-07"));
-const idxJun30 = cleared.findIndex((t) => t.date === "2026-06-30");
-if (idxAug < 0 || idxJun30 < 0 || idxAug > idxJun30) {
+const bangladesh = cleared.find((t) => t.merchant === "Bangladesh High Commission");
+if (!bangladesh || bangladesh.date !== "2026-07-01" || Math.abs(bangladesh.amount + 75) > 0.001) {
   failures++;
-  console.log("July/August rows must sit above 2026-06-30 in newest-first order");
+  console.log(
+    `MISMATCH Bangladesh: expected cleared -75 on 2026-07-01, got ${bangladesh?.amount} on ${bangladesh?.date} (${bangladesh?.status})`
+  );
+}
+
+const nazneen = cleared.find((t) => t.merchant.toLowerCase().includes("nazneen"));
+if (!nazneen || nazneen.amount <= 0) {
+  failures++;
+  console.log("MISSING Nazneen bank credit");
 }
 
 for (const t of transactions) {
   const ml = t.merchant.toLowerCase();
   if (excluded.some((s) => ml.includes(s))) {
     failures++;
-    console.log(`EXCLUDED merchant present: ${t.merchant} (${t.status})`);
+    console.log(`EXCLUDED merchant present: ${t.merchant} (${t.date})`);
   }
 }
 
-for (const name of ["Lidl", "Iceland", "Uber", "TFL - Transport for London", "Sainsbury's"]) {
-  if (!cleared.some((t) => t.merchant === name || t.merchant.startsWith("Bank credit J SAINSBURYS"))) {
-    if (name === "Sainsbury's") {
-      const has = cleared.some((t) => t.merchant === "Sainsbury's" || t.merchant.startsWith("Bank credit J SAINSBURYS"));
-      if (!has) {
-        failures++;
-        console.log(`MISSING merchant: ${name}`);
-      }
-    } else if (!cleared.some((t) => t.merchant === name)) {
-      failures++;
-      console.log(`MISSING merchant: ${name}`);
-    }
+const credits = cleared.filter((t) => t.amount > 0);
+if (credits.length < 8) {
+  failures++;
+  console.log(`TOO FEW credits: ${credits.length}`);
+}
+
+for (const name of ["Lidl", "Iceland", "Sainsbury's", "TFL - Transport for London"]) {
+  if (!cleared.some((t) => t.merchant === name)) {
+    failures++;
+    console.log(`MISSING merchant: ${name}`);
   }
+}
+
+const idxJulAug = cleared.findIndex((t) => t.date >= "2026-07-01");
+const idxJun30 = cleared.findIndex((t) => t.date === "2026-06-30");
+if (idxJulAug < 0 || idxJun30 < 0 || idxJulAug > idxJun30) {
+  failures++;
+  console.log("July/August rows must sit above 2026-06-30 in newest-first order");
 }
 
 let prev = null;
@@ -106,22 +117,16 @@ for (let i = cleared.length - 1; i >= 0; i--) {
   prev = t;
 }
 
-const pendingExcluded = pending.filter((t) =>
-  excluded.some((s) => t.merchant.toLowerCase().includes(s))
-);
-if (pendingExcluded.length) {
-  failures++;
-  console.log(`EXCLUDED pending still present: ${pendingExcluded.map((t) => t.merchant).join(", ")}`);
-}
+const tflCount = cleared.filter((t) => t.merchant === "TFL - Transport for London").length;
 
 console.log(`cleared transactions: ${cleared.length}`);
 console.log(`pending transactions: ${pending.length}`);
 console.log(`account.balance: ${account.balance}`);
 console.log(`newest date: ${newest?.date} ${newest?.merchant}`);
-console.log(`July/August count: ${cleared.filter((t) => t.date >= "2026-07-01").length}`);
-
-const bangladesh = pending.find((t) => t.merchant === "Bangladesh High Commission");
-console.log(`Bangladesh pending: ${bangladesh?.amount ?? "none"}`);
+console.log(`TFL rows: ${tflCount}`);
+console.log(`credits: ${credits.length}`);
+console.log(`Bangladesh cleared: ${bangladesh?.amount} on ${bangladesh?.date}`);
+console.log(`Nazneen credit: ${nazneen?.amount} on ${nazneen?.date}`);
 
 console.log(failures === 0 ? "ALL CHECKS PASS ✓" : `${failures} FAILURES`);
 if (failures !== 0) process.exit(1);
