@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 2613.89;
+const expectedAccountBalance = 3063.89;
 const excluded = [
   "uber",
   "deliveroo",
@@ -70,9 +70,9 @@ if (!bangladesh || bangladesh.date !== "2026-07-01" || Math.abs(bangladesh.amoun
 }
 
 const nazneen = cleared.find((t) => t.merchant.toLowerCase().includes("nazneen"));
-if (!nazneen || nazneen.amount <= 0) {
+if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001) {
   failures++;
-  console.log("MISSING Nazneen bank credit");
+  console.log("MISSING/WRONG Nazneen bank credit (expected +500)");
 }
 
 for (const t of transactions) {
