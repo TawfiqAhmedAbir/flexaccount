@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 2730.19;
+const expectedAccountBalance = 2308.0;
 const excluded = [
   "uber",
   "deliveroo",
@@ -123,6 +123,19 @@ const sainsburys = cleared.filter((t) => t.merchant === "Sainsbury's");
 if (sainsburys.length !== 0) {
   failures++;
   console.log(`UNEXPECTED Sainsbury's rows: ${sainsburys.length}`);
+}
+
+const cursor55 = cleared.filter(
+  (t) => t.merchant === "Cursor" && t.date >= "2026-07-01" && Math.abs(t.amount + 55) < 0.001
+);
+const higgsfield = cleared.filter(
+  (t) => t.merchant === "Higgsfield AI" && Math.abs(t.amount + 33) < 0.001
+);
+if (cursor55.length !== 2 || higgsfield.length !== 2) {
+  failures++;
+  console.log(
+    `WRONG subscription rows: Cursor £55 x${cursor55.length}, Higgsfield AI £33 x${higgsfield.length} (expected 2 each)`
+  );
 }
 
 const idxJulAug = cleared.findIndex((t) => t.date >= "2026-07-01");

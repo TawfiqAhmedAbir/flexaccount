@@ -52,7 +52,7 @@ export interface Transaction {
 }
 
 // Account opening balance brought forward on 1 Feb 2026.
-const OPENING_BALANCE = 478.24;
+const OPENING_BALANCE = 232.05;
 const INDIGO = "#2A2D6B";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -66,6 +66,7 @@ const categoryByMerchant: Record<string, Category> = {
   "Bangladesh High Commission": "transfer",
   Grok: "subscription",
   Cursor: "subscription",
+  "Higgsfield AI": "subscription",
   LuxuryTools: "subscription",
   "TFL - Transport for London": "transport",
   "TfL - Transport for London": "transport",
@@ -262,6 +263,7 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-12", "Rojalpark Express", -7.75],
   ["2026-08-12", "TFL - Transport for London", -4.8],
   ["2026-08-12", "Bank credit NAZNEEN Q 15", 500.0],
+  ["2026-08-12", "Cursor", -55.0],
   ["2026-08-11", "TFL - Transport for London", -7.6],
   ["2026-08-10", "TFL - Transport for London", -6.65],
   ["2026-08-10", "TFL - Transport for London", -6.1],
@@ -269,6 +271,7 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-10", "Favourable Chicken - Square", -6.49],
   ["2026-08-10", "Favourable Chicken - Square", -1.0],
   ["2026-08-10", "TFL - Transport for London", -10.3],
+  ["2026-08-09", "Higgsfield AI", -33.0],
   ["2026-08-07", "Top Dixie Chicken", -5.99],
   ["2026-08-06", "Top Dixie Chicken", -5.99],
   ["2026-08-04", "Rojalpark Express", -8.5],
@@ -295,12 +298,14 @@ const rawCleared: [string, string, number][] = [
   ["2026-07-21", "TFL - Transport for London", -8.05],
   ["2026-07-20", "TFL - Transport for London", -9.45],
   ["2026-07-20", "Rojalpark Express", -10.3],
+  ["2026-07-19", "Higgsfield AI", -33.0],
   ["2026-07-17", "Prime | Premier Stores", -4.98],
   ["2026-07-15", "Rojalpark Express", -9.79],
   ["2026-07-15", "TFL - Transport for London", -7.6],
   ["2026-07-15", "Top Dixie Chicken", -6.99],
   ["2026-07-13", "TFL - Transport for London", -6.65],
   ["2026-07-13", "TFL - Transport for London", -6.75],
+  ["2026-07-12", "Cursor", -55.0],
   ["2026-07-11", "Lidl", -2.93],
   ["2026-07-10", "Prime | Premier Stores", -3.38],
   ["2026-07-10", "TFL - Transport for London", -15.3],
