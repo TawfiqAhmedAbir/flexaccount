@@ -52,7 +52,7 @@ export interface Transaction {
 }
 
 // Account opening balance brought forward on 1 Feb 2026.
-const OPENING_BALANCE = 198.02;
+const OPENING_BALANCE = 185.27;
 const INDIGO = "#2A2D6B";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -265,8 +265,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-12", "Bank credit NAZNEEN Q 15", 500.0],
   ["2026-08-12", "Cursor", -55.0],
   ["2026-08-11", "TFL - Transport for London", -7.6],
-  ["2026-08-10", "TFL - Transport for London", -6.65],
-  ["2026-08-10", "TFL - Transport for London", -6.1],
   ["2026-08-10", "Favourable Chicken - Square", -6.49],
   ["2026-08-10", "Favourable Chicken - Square", -1.0],
   ["2026-08-10", "TFL - Transport for London", -10.3],
