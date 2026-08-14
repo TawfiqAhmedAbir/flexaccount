@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 2308.0;
+const expectedAccountBalance = 308.0;
 const excluded = [
   "uber",
   "deliveroo",
@@ -80,11 +80,21 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 if (
   !newest ||
   newest.date !== "2026-08-13" ||
-  newest.merchant !== "TFL - Transport for London" ||
-  Math.abs(newest.amount + 1.75) > 0.001
+  newest.merchant !== "London South Bank Univers" ||
+  Math.abs(newest.amount + 2000) > 0.001
 ) {
   failures++;
-  console.log(`WRONG newest row: expected TFL -1.75 on 2026-08-13, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+  console.log(`WRONG newest row: expected LSBU -2000 on 2026-08-13, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+}
+
+const lsbu = cleared.filter((t) => t.merchant === "London South Bank Univers");
+if (
+  lsbu.length !== 2 ||
+  !lsbu.some((t) => t.date === "2026-08-13" && Math.abs(t.amount + 2000) < 0.001) ||
+  !lsbu.some((t) => t.date === "2026-06-01" && Math.abs(t.amount + 4100) < 0.001)
+) {
+  failures++;
+  console.log(`WRONG LSBU rows: ${lsbu.map((t) => `${t.date} ${t.amount}`).join(", ")}`);
 }
 
 const convenienceJulAug = cleared.filter(
