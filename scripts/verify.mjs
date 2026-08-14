@@ -93,9 +93,9 @@ const convenienceJulAug = cleared.filter(
     (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
 );
 const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
-if (Math.abs(convenienceTotal + 99.82) > 0.001) {
+if (Math.abs(convenienceTotal + 65.79) > 0.001) {
   failures++;
-  console.log(`WRONG convenience total: expected -99.82 got ${convenienceTotal.toFixed(2)}`);
+  console.log(`WRONG convenience total: expected -65.79 got ${convenienceTotal.toFixed(2)}`);
 }
 
 for (const t of transactions) {

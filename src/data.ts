@@ -52,7 +52,7 @@ export interface Transaction {
 }
 
 // Account opening balance brought forward on 1 Feb 2026.
-const OPENING_BALANCE = 232.05;
+const OPENING_BALANCE = 198.02;
 const INDIGO = "#2A2D6B";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -267,7 +267,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-11", "TFL - Transport for London", -7.6],
   ["2026-08-10", "TFL - Transport for London", -6.65],
   ["2026-08-10", "TFL - Transport for London", -6.1],
-  ["2026-08-10", "Rojalpark Express", -9.5],
   ["2026-08-10", "Favourable Chicken - Square", -6.49],
   ["2026-08-10", "Favourable Chicken - Square", -1.0],
   ["2026-08-10", "TFL - Transport for London", -10.3],
@@ -277,7 +276,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-04", "Rojalpark Express", -8.5],
   ["2026-08-03", "TFL - Transport for London", -6.65],
   ["2026-08-03", "Favourable Fried Chicken", -3.0],
-  ["2026-08-03", "Rojalpark Express", -4.99],
   ["2026-08-01", "Iceland", -9.15],
   ["2026-08-01", "Rojalpark Express", -7.5],
   ["2026-08-01", "QAISER NAZNEEN 20", -10.0],
@@ -289,7 +287,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-07-27", "Favourable Fried Chicken", -5.29],
   ["2026-07-27", "TFL - Transport for London", -13.1],
   ["2026-07-27", "Favourable Fried Chicken", -5.0],
-  ["2026-07-27", "Rojalpark Express", -9.24],
   ["2026-07-27", "Top Dixie Chicken", -6.0],
   ["2026-07-27", "Top Dixie Chicken", -1.0],
   ["2026-07-24", "Rojalpark Express", -7.75],
@@ -297,7 +294,6 @@ const rawCleared: [string, string, number][] = [
   ["2026-07-23", "Top Dixie Chicken", -10.94],
   ["2026-07-21", "TFL - Transport for London", -8.05],
   ["2026-07-20", "TFL - Transport for London", -9.45],
-  ["2026-07-20", "Rojalpark Express", -10.3],
   ["2026-07-19", "Higgsfield AI", -33.0],
   ["2026-07-17", "Prime | Premier Stores", -4.98],
   ["2026-07-15", "Rojalpark Express", -9.79],
