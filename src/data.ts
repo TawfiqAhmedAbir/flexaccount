@@ -259,6 +259,8 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // Bangladesh High Commission cleared on 1 Jul, the day after it
 // was pending.
 const rawCleared: [string, string, number][] = [
+  ["2026-08-15", "TFL - Transport for London", -1.75],
+  ["2026-08-15", "Prime | Premier Stores", -4.0],
   ["2026-08-13", "London South Bank Univers", -2100.0],
   ["2026-08-13", "TFL - Transport for London", -1.75],
   ["2026-08-12", "Rojalpark Express", -7.75],

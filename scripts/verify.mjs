@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 208.0;
+const expectedAccountBalance = 202.25;
 const excluded = [
   "uber",
   "deliveroo",
@@ -79,12 +79,21 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 
 if (
   !newest ||
-  newest.date !== "2026-08-13" ||
-  newest.merchant !== "London South Bank Univers" ||
-  Math.abs(newest.amount + 2100) > 0.001
+  newest.date !== "2026-08-15" ||
+  newest.merchant !== "TFL - Transport for London" ||
+  Math.abs(newest.amount + 1.75) > 0.001
 ) {
   failures++;
-  console.log(`WRONG newest row: expected LSBU -2100 on 2026-08-13, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+  console.log(`WRONG newest row: expected TFL -1.75 on 2026-08-15, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+}
+
+const aug15 = cleared.filter((t) => t.date === "2026-08-15");
+if (
+  aug15.length !== 2 ||
+  !aug15.some((t) => t.merchant === "Prime | Premier Stores" && Math.abs(t.amount + 4) < 0.001)
+) {
+  failures++;
+  console.log(`WRONG 15 Aug rows: ${aug15.map((t) => `${t.merchant} ${t.amount}`).join(", ")}`);
 }
 
 const lsbu = cleared.filter((t) => t.merchant === "London South Bank Univers");
@@ -103,9 +112,9 @@ const convenienceJulAug = cleared.filter(
     (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
 );
 const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
-if (Math.abs(convenienceTotal + 65.79) > 0.001) {
+if (Math.abs(convenienceTotal + 69.79) > 0.001) {
   failures++;
-  console.log(`WRONG convenience total: expected -65.79 got ${convenienceTotal.toFixed(2)}`);
+  console.log(`WRONG convenience total: expected -69.79 got ${convenienceTotal.toFixed(2)}`);
 }
 
 for (const t of transactions) {
