@@ -71,6 +71,7 @@ const categoryByMerchant: Record<string, Category> = {
   "TFL - Transport for London": "transport",
   "TfL - Transport for London": "transport",
   Lidl: "grocery",
+  Tesco: "grocery",
   Iceland: "grocery",
   "Dagenham Halal Supermarket": "grocery",
   "Degenham Halal Supermarke": "grocery",
@@ -115,6 +116,8 @@ function badgeFor(merchant: string): Badge {
       return { kind: "apple" };
     case "Lidl":
       return { kind: "initial", letter: "L", color: "#0050AA" };
+    case "Tesco":
+      return { kind: "initial", letter: "T", color: "#00539F" };
     case "Iceland":
       return { kind: "initial", letter: "I", color: "#CC0000" };
     default: {
@@ -174,6 +177,12 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     phone: "+44 20 8318 2200",
     website: "www.lidl.co.uk",
     cardDescriptor: "LIDL GB / LEWISHAM / GB / CONTACTLESS / 5411",
+  },
+  Tesco: {
+    location: "Tesco Express, 103 Heathway, Dagenham RM9 5AL, UK",
+    phone: "+44 345 026 9576",
+    website: "www.tesco.com",
+    cardDescriptor: "TESCO STORES / DAGENHAM / GB / CONTACTLESS / 5411",
   },
   Iceland: {
     location: "Lewisham Centre, London SE13 7EP, UK",
@@ -259,6 +268,15 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // Bangladesh High Commission cleared on 1 Jul, the day after it
 // was pending.
 const rawCleared: [string, string, number][] = [
+  ["2026-08-19", "Prime | Premier Stores", -5.47],
+  ["2026-08-19", "Tesco", -5.43],
+  ["2026-08-19", "Lidl", -0.48],
+  ["2026-08-19", "Bank credit J SAINSBURYS PLC 5750742-1", 791.06],
+  ["2026-08-18", "Top Dixie Chicken", -5.99],
+  ["2026-08-17", "TFL - Transport for London", -6.65],
+  ["2026-08-17", "Rojalpark Express", -3.0],
+  ["2026-08-17", "Rojalpark Express", -1.7],
+  ["2026-08-17", "TFL - Transport for London", -2.4],
   ["2026-08-15", "TFL - Transport for London", -1.75],
   ["2026-08-15", "Prime | Premier Stores", -4.0],
   ["2026-08-13", "London South Bank Univers", -2100.0],
