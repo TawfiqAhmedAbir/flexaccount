@@ -74,7 +74,6 @@ const categoryByMerchant: Record<string, Category> = {
   Tesco: "grocery",
   Iceland: "grocery",
   "SAINSBURY'S LEWISHAM L": "grocery",
-  "KFC FARRINGDON": "food",
   "Metros Fried Chicken": "food",
   "Dagenham Halal Supermarket": "grocery",
   "Degenham Halal Supermarke": "grocery",
@@ -186,12 +185,6 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     phone: "+44 20 8593 2264",
     website: "magazin-romanesc.business.site",
     cardDescriptor: "MAGAZIN ROMANESC / DAGENHAM / GB / CONTACTLESS / 5499",
-  },
-  "KFC FARRINGDON": {
-    location: "1 Cowcross St, Farringdon, London EC1M 6DR, UK",
-    phone: "+44 20 7253 1971",
-    website: "www.kfc.co.uk",
-    cardDescriptor: "KFC FARRINGDON / LONDON / GB / CONTACTLESS / 5814",
   },
   "SAINSBURY'S LEWISHAM L": {
     location: "Unit 33, Lewisham Centre, London SE13 7EP, UK",
@@ -309,7 +302,6 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 const rawCleared: [string, string, number][] = [
   ["2026-08-26", "Barber King", -12.0],
   ["2026-08-26", "Magazin Romanesc", -1.2],
-  ["2026-08-26", "KFC FARRINGDON", -2.49],
   ["2026-08-26", "SAINSBURY'S LEWISHAM L", -1.65],
   ["2026-08-26", "Apple / iTunes", -0.99],
   ["2026-08-25", "Top Dixie Chicken", -5.4],

@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 890.9;
+const expectedAccountBalance = 893.39;
 const excluded = [
   "uber",
   "deliveroo",
