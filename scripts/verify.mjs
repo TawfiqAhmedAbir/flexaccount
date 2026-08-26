@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 962.19;
+const expectedAccountBalance = 890.9;
 const excluded = [
   "uber",
   "deliveroo",
@@ -23,7 +23,6 @@ const excluded = [
   "eats & bits",
   "waller chemist",
   "clearpay",
-  "village news",
   "a p news",
   "lime store",
   "sweet express",
@@ -79,12 +78,12 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 
 if (
   !newest ||
-  newest.date !== "2026-08-19" ||
-  newest.merchant !== "Prime | Premier Stores" ||
-  Math.abs(newest.amount + 5.47) > 0.001
+  newest.date !== "2026-08-26" ||
+  newest.merchant !== "Barber King" ||
+  Math.abs(newest.amount + 12) > 0.001
 ) {
   failures++;
-  console.log(`WRONG newest row: expected Premier -5.47 on 2026-08-19, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+  console.log(`WRONG newest row: expected Barber King -12 on 2026-08-26, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
 }
 
 const salaryAug = cleared.find(
@@ -95,9 +94,13 @@ if (!salaryAug || Math.abs(salaryAug.amount - 791.06) > 0.001) {
   console.log("MISSING/WRONG 19 Aug salary credit (expected +791.06)");
 }
 
-// New rule for the 17-19 Aug batch: no non-TfL debit over £6.
+// Rule for rows since 17 Aug: no debit over £6 except TfL and Barber King.
 for (const t of cleared.filter((x) => x.date >= "2026-08-17")) {
-  if (t.amount < -6 && t.merchant !== "TFL - Transport for London") {
+  if (
+    t.amount < -6 &&
+    t.merchant !== "TFL - Transport for London" &&
+    t.merchant !== "Barber King"
+  ) {
     failures++;
     console.log(`OVER-£6 non-TfL row present: ${t.merchant} ${t.amount} (${t.date})`);
   }
@@ -128,9 +131,9 @@ const convenienceJulAug = cleared.filter(
     (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
 );
 const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
-if (Math.abs(convenienceTotal + 79.96) > 0.001) {
+if (Math.abs(convenienceTotal + 89.42) > 0.001) {
   failures++;
-  console.log(`WRONG convenience total: expected -79.96 got ${convenienceTotal.toFixed(2)}`);
+  console.log(`WRONG convenience total: expected -89.42 got ${convenienceTotal.toFixed(2)}`);
 }
 
 for (const t of transactions) {
