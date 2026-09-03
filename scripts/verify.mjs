@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 856.35;
+const expectedAccountBalance = 1056.35;
 const excluded = [
   "uber",
   "deliveroo",
@@ -102,9 +102,9 @@ for (const d of ["2026-08-30", "2026-08-31"]) {
 const salaryAug = cleared.find(
   (t) => t.date === "2026-08-19" && t.merchant === "Bank credit J SAINSBURYS PLC 5750742-1"
 );
-if (!salaryAug || Math.abs(salaryAug.amount - 791.06) > 0.001) {
+if (!salaryAug || Math.abs(salaryAug.amount - 991.06) > 0.001) {
   failures++;
-  console.log("MISSING/WRONG 19 Aug salary credit (expected +791.06)");
+  console.log("MISSING/WRONG 19 Aug salary credit (expected +991.06)");
 }
 
 // Rule for rows since 17 Aug: no debit over £6 except TfL and Barber King.

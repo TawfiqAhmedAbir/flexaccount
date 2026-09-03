@@ -334,7 +334,7 @@ const rawCleared: [string, string, number][] = [
   ["2026-08-19", "Prime | Premier Stores", -5.47],
   ["2026-08-19", "Tesco", -5.43],
   ["2026-08-19", "Lidl", -0.48],
-  ["2026-08-19", "Bank credit J SAINSBURYS PLC 5750742-1", 791.06],
+  ["2026-08-19", "Bank credit J SAINSBURYS PLC 5750742-1", 991.06],
   ["2026-08-18", "Top Dixie Chicken", -5.99],
   ["2026-08-17", "TFL - Transport for London", -6.65],
   ["2026-08-17", "Rojalpark Express", -3.0],
