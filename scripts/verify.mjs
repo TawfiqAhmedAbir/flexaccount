@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 893.39;
+const expectedAccountBalance = 856.35;
 const excluded = [
   "uber",
   "deliveroo",
@@ -78,12 +78,25 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 
 if (
   !newest ||
-  newest.date !== "2026-08-26" ||
-  newest.merchant !== "Barber King" ||
-  Math.abs(newest.amount + 12) > 0.001
+  newest.date !== "2026-09-02" ||
+  newest.merchant !== "Top Dixie Chicken" ||
+  Math.abs(newest.amount + 6) > 0.001
 ) {
   failures++;
-  console.log(`WRONG newest row: expected Barber King -12 on 2026-08-26, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+  console.log(`WRONG newest row: expected Top Dixie -6 on 2026-09-02, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+}
+
+const laziz = cleared.find((t) => t.merchant === "Laziz Biriyani");
+if (!laziz || laziz.date !== "2026-09-01" || Math.abs(laziz.amount + 4) > 0.001) {
+  failures++;
+  console.log("MISSING/WRONG Laziz Biriyani (expected -4 on Tuesday 2026-09-01)");
+}
+
+for (const d of ["2026-08-30", "2026-08-31"]) {
+  if (!cleared.some((t) => t.date === d && t.merchant === "TFL - Transport for London")) {
+    failures++;
+    console.log(`MISSING TfL charge on ${d}`);
+  }
 }
 
 const salaryAug = cleared.find(
@@ -131,9 +144,9 @@ const convenienceJulAug = cleared.filter(
     (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
 );
 const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
-if (Math.abs(convenienceTotal + 89.42) > 0.001) {
+if (Math.abs(convenienceTotal + 93.11) > 0.001) {
   failures++;
-  console.log(`WRONG convenience total: expected -89.42 got ${convenienceTotal.toFixed(2)}`);
+  console.log(`WRONG convenience total: expected -93.11 got ${convenienceTotal.toFixed(2)}`);
 }
 
 for (const t of transactions) {

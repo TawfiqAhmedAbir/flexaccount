@@ -75,6 +75,7 @@ const categoryByMerchant: Record<string, Category> = {
   Iceland: "grocery",
   "SAINSBURY'S LEWISHAM L": "grocery",
   "Metros Fried Chicken": "food",
+  "Laziz Biriyani": "food",
   "Dagenham Halal Supermarket": "grocery",
   "Degenham Halal Supermarke": "grocery",
   "The Frying Spot": "food",
@@ -198,6 +199,12 @@ const metaByMerchant: Record<string, MerchantMeta> = {
     website: "www.metrosfriedchicken.co.uk",
     cardDescriptor: "METROS FRIED CHICKEN / DAGENHAM / GB / CONTACTLESS / 5814",
   },
+  "Laziz Biriyani": {
+    location: "142 Green St, Upton Park, London E7 8JQ, UK",
+    phone: "+44 20 8472 5599",
+    website: "www.lazizbiriyani.co.uk",
+    cardDescriptor: "LAZIZ BIRIYANI / UPTON PARK / GB / CONTACTLESS / 5812",
+  },
   "Village News": {
     location: "31 Church Elm Ln, Dagenham RM10 9QS, UK",
     phone: "+44 20 8592 1180",
@@ -300,6 +307,15 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // Bangladesh High Commission cleared on 1 Jul, the day after it
 // was pending.
 const rawCleared: [string, string, number][] = [
+  ["2026-09-02", "Top Dixie Chicken", -6.0],
+  ["2026-09-02", "TFL - Transport for London", -3.8],
+  ["2026-09-01", "Laziz Biriyani", -4.0],
+  ["2026-09-01", "Prime | Premier Stores", -2.0],
+  ["2026-08-31", "TFL - Transport for London", -5.25],
+  ["2026-08-30", "TFL - Transport for London", -3.5],
+  ["2026-08-29", "Top Dixie Chicken", -6.0],
+  ["2026-08-28", "TFL - Transport for London", -4.8],
+  ["2026-08-27", "Prime | Premier Stores", -1.69],
   ["2026-08-26", "Barber King", -12.0],
   ["2026-08-26", "Magazin Romanesc", -1.2],
   ["2026-08-26", "SAINSBURY'S LEWISHAM L", -1.65],
