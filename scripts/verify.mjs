@@ -12,131 +12,214 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expected = {
-  "2026-06-16": 745.7,
-  "2026-06-15": 753.5,
-  "2026-06-14": 773.5,
-  "2026-06-13": 779.5,
-  "2026-06-12": 783.4,
-  "2026-06-10": 788.2,
-  "2026-06-01": 796.0,
-  "2026-05-30": 4896.0,
-  "2026-05-28": 4036.0,
-  "2026-05-27": 4048.1,
-  "2026-05-25": 4048.99,
-  "2026-05-24": 4055.49,
-  "2026-05-23": 4060.57,
-  "2026-05-21": 4066.72,
-  "2026-05-20": 4071.3,
-  "2026-05-17": 4102.45,
-  "2026-05-16": 4108.42,
-  "2026-05-14": 4127.82,
-  "2026-05-13": 4133.97,
-  "2026-05-12": 4144.84,
-  "2026-05-10": 4164.84,
-  "2026-05-09": 4170.99,
-  "2026-05-08": 4176.86,
-  "2026-05-07": 4196.86,
-  "2026-05-06": 4201.94,
-  "2026-05-05": 4208.09,
-  "2026-05-03": 4238.09,
-  "2026-05-02": 4243.17,
-  "2026-04-30": 4249.32,
-  "2026-04-29": 4253.9,
-  "2026-04-26": 4265.04,
-  "2026-04-25": 4273.11,
-  "2026-04-23": 4277.69,
-  "2026-04-22": 4283.84,
-  "2026-04-20": 4288.92,
-  "2026-04-19": 4313.92,
-  "2026-04-18": 4320.07,
-  "2026-04-16": 4338.74,
-  "2026-04-15": 4343.82,
-  "2026-04-12": 4357.16,
-  "2026-04-11": 4382.24,
-  "2026-04-09": 4388.39,
-  "2026-04-08": 4392.97,
-  "2026-04-05": 4399.12,
-  "2026-04-04": 4435.19,
-  "2026-04-03": 4439.77,
-  "2026-04-02": 3527.77,
-  "2026-04-01": 3533.92,
-  "2026-03-29": 3544.49,
-  "2026-03-28": 3550.64,
-  "2026-03-26": 3557.42,
-  "2026-03-25": 3562.5,
-  "2026-03-22": 3568.65,
-  "2026-03-21": 3603.73,
-  "2026-03-20": 3609.88,
-  "2026-03-19": 3634.88,
-  "2026-03-18": 3639.46,
-  "2026-03-15": 3652.6,
-  "2026-03-14": 3659.67,
-  "2026-03-12": 3677.51,
-  "2026-03-11": 3703.66,
-  "2026-03-08": 3708.74,
-  "2026-03-07": 3714.89,
-  "2026-03-06": 3721.97,
-  "2026-03-05": 2033.97,
-  "2026-03-04": 2069.05,
-  "2026-03-01": 2079.7,
-  "2026-02-28": 2084.78,
-  "2026-02-26": 2098.91,
-  "2026-02-25": 2103.49,
-  "2026-02-22": 2109.64,
-  "2026-02-21": 2115.61,
-  "2026-02-20": 2120.19,
-  "2026-02-19": 2145.19,
-  "2026-02-18": 2151.34,
-  "2026-02-17": 2162.92,
-  "2026-02-15": 2163.91,
-  "2026-02-14": 2170.06,
-  "2026-02-12": 2190.75,
-  "2026-02-11": 2215.83,
-  "2026-02-08": 2221.98,
-  "2026-02-07": 2227.06,
-  "2026-02-06": 2233.21,
-  "2026-02-05": 533.21,
-  "2026-02-04": 567.79,
-  "2026-02-01": 579.93,
-};
-const expectedAccountBalance = 745.7;
+const expectedAccountBalance = 1056.35;
+const excluded = [
+  "uber",
+  "deliveroo",
+  "revolut",
+  "atm",
+  "cash withdrawal",
+  "notemachine",
+  "eats & bits",
+  "waller chemist",
+  "clearpay",
+  "a p news",
+  "lime store",
+  "sweet express",
+  "peacock",
+  "variety foods",
+  "heathway mobil",
+  "greenlane",
+  "best one",
+  "nisa",
+  "londis",
+  "costcutter",
+  "bim's",
+];
 
-// First (newest) transaction per date carries that day's closing balance.
-const firstByDate = {};
-for (const t of transactions) {
-  if (t.status === "pending") continue;
-  if (!(t.date in firstByDate)) firstByDate[t.date] = t.balanceAfter;
-}
+const cleared = transactions.filter((t) => t.status !== "pending");
+const pending = transactions.filter((t) => t.status === "pending");
 
 let failures = 0;
-for (const [date, exp] of Object.entries(expected)) {
-  const got = firstByDate[date];
-  if (Math.abs(got - exp) > 0.001) {
+
+const newest = cleared[0];
+if (!newest || Math.abs(newest.balanceAfter - account.balance) > 0.001) {
+  failures++;
+  console.log(
+    `MISMATCH account.balance vs newest: expected ${newest?.balanceAfter} got ${account.balance}`
+  );
+}
+
+if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
+  failures++;
+  console.log(
+    `MISMATCH account.balance: expected ${expectedAccountBalance} got ${account.balance}`
+  );
+}
+
+if (pending.length !== 0) {
+  failures++;
+  console.log(`UNEXPECTED pending rows: ${pending.map((t) => t.merchant).join(", ")}`);
+}
+
+const bangladesh = cleared.find((t) => t.merchant === "Bangladesh High Commission");
+if (!bangladesh || bangladesh.date !== "2026-07-01" || Math.abs(bangladesh.amount + 75) > 0.001) {
+  failures++;
+  console.log(
+    `MISMATCH Bangladesh: expected cleared -75 on 2026-07-01, got ${bangladesh?.amount} on ${bangladesh?.date} (${bangladesh?.status})`
+  );
+}
+
+const nazneen = cleared.find((t) => t.merchant === "Bank credit NAZNEEN Q 15");
+if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026-08-12") {
+  failures++;
+  console.log("MISSING/WRONG Nazneen bank credit (expected +500 on 2026-08-12)");
+}
+
+if (
+  !newest ||
+  newest.date !== "2026-09-02" ||
+  newest.merchant !== "Top Dixie Chicken" ||
+  Math.abs(newest.amount + 6) > 0.001
+) {
+  failures++;
+  console.log(`WRONG newest row: expected Top Dixie -6 on 2026-09-02, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+}
+
+const laziz = cleared.find((t) => t.merchant === "Laziz Biriyani");
+if (!laziz || laziz.date !== "2026-09-01" || Math.abs(laziz.amount + 4) > 0.001) {
+  failures++;
+  console.log("MISSING/WRONG Laziz Biriyani (expected -4 on Tuesday 2026-09-01)");
+}
+
+for (const d of ["2026-08-30", "2026-08-31"]) {
+  if (!cleared.some((t) => t.date === d && t.merchant === "TFL - Transport for London")) {
     failures++;
-    console.log(`MISMATCH ${date}: expected ${exp} got ${got}`);
+    console.log(`MISSING TfL charge on ${d}`);
   }
 }
 
-const cleared = transactions.filter((t) => t.status !== "pending");
-console.log(`cleared transactions: ${cleared.length}`);
-console.log(`account.balance: ${account.balance}`);
-if (Math.abs(account.balance - expectedAccountBalance) > 0.001) {
-  failures++;
-  console.log(`MISMATCH account.balance: expected ${expectedAccountBalance} got ${account.balance}`);
-}
-
-// Spot-check LSBU tuition
-const lsbu = transactions.find((t) => t.merchant === "London South Bank Univers");
-console.log(
-  `LSBU before/after: ${lsbu.balanceBefore} -> ${lsbu.balanceAfter} (expect 4896 -> 796)`
+const salaryAug = cleared.find(
+  (t) => t.date === "2026-08-19" && t.merchant === "Bank credit J SAINSBURYS PLC 5750742-1"
 );
-
-// balanceBefore = balanceAfter - amount consistency
-let inconsistent = 0;
-for (const t of cleared) {
-  if (Math.abs(t.balanceBefore - (t.balanceAfter - t.amount)) > 0.001) inconsistent++;
+if (!salaryAug || Math.abs(salaryAug.amount - 991.06) > 0.001) {
+  failures++;
+  console.log("MISSING/WRONG 19 Aug salary credit (expected +991.06)");
 }
 
-console.log(failures === 0 ? "ALL DAY CLOSINGS MATCH ✓" : `${failures} FAILURES`);
-console.log(`balanceBefore consistency issues: ${inconsistent}`);
+// Rule for rows since 17 Aug: no debit over £6 except TfL and Barber King.
+for (const t of cleared.filter((x) => x.date >= "2026-08-17")) {
+  if (
+    t.amount < -6 &&
+    t.merchant !== "TFL - Transport for London" &&
+    t.merchant !== "Barber King"
+  ) {
+    failures++;
+    console.log(`OVER-£6 non-TfL row present: ${t.merchant} ${t.amount} (${t.date})`);
+  }
+}
+
+const aug15 = cleared.filter((t) => t.date === "2026-08-15");
+if (
+  aug15.length !== 2 ||
+  !aug15.some((t) => t.merchant === "Prime | Premier Stores" && Math.abs(t.amount + 4) < 0.001)
+) {
+  failures++;
+  console.log(`WRONG 15 Aug rows: ${aug15.map((t) => `${t.merchant} ${t.amount}`).join(", ")}`);
+}
+
+const lsbu = cleared.filter((t) => t.merchant === "London South Bank Univers");
+if (
+  lsbu.length !== 2 ||
+  !lsbu.some((t) => t.date === "2026-08-13" && Math.abs(t.amount + 2100) < 0.001) ||
+  !lsbu.some((t) => t.date === "2026-06-01" && Math.abs(t.amount + 4100) < 0.001)
+) {
+  failures++;
+  console.log(`WRONG LSBU rows: ${lsbu.map((t) => `${t.date} ${t.amount}`).join(", ")}`);
+}
+
+const convenienceJulAug = cleared.filter(
+  (t) =>
+    t.date >= "2026-07-01" &&
+    (t.merchant === "Rojalpark Express" || t.merchant === "Prime | Premier Stores")
+);
+const convenienceTotal = convenienceJulAug.reduce((s, t) => s + t.amount, 0);
+if (Math.abs(convenienceTotal + 93.11) > 0.001) {
+  failures++;
+  console.log(`WRONG convenience total: expected -93.11 got ${convenienceTotal.toFixed(2)}`);
+}
+
+for (const t of transactions) {
+  const ml = t.merchant.toLowerCase();
+  if (excluded.some((s) => ml.includes(s))) {
+    failures++;
+    console.log(`EXCLUDED merchant present: ${t.merchant} (${t.date})`);
+  }
+}
+
+const credits = cleared.filter((t) => t.amount > 0);
+if (credits.length < 8) {
+  failures++;
+  console.log(`TOO FEW credits: ${credits.length}`);
+}
+
+for (const name of ["Lidl", "Iceland", "TFL - Transport for London"]) {
+  if (!cleared.some((t) => t.merchant === name)) {
+    failures++;
+    console.log(`MISSING merchant: ${name}`);
+  }
+}
+
+const sainsburys = cleared.filter((t) => t.merchant === "Sainsbury's");
+if (sainsburys.length !== 0) {
+  failures++;
+  console.log(`UNEXPECTED Sainsbury's rows: ${sainsburys.length}`);
+}
+
+const cursor55 = cleared.filter(
+  (t) => t.merchant === "Cursor" && t.date >= "2026-07-01" && Math.abs(t.amount + 55) < 0.001
+);
+const higgsfield = cleared.filter(
+  (t) => t.merchant === "Higgsfield AI" && Math.abs(t.amount + 33) < 0.001
+);
+if (cursor55.length !== 2 || higgsfield.length !== 2) {
+  failures++;
+  console.log(
+    `WRONG subscription rows: Cursor £55 x${cursor55.length}, Higgsfield AI £33 x${higgsfield.length} (expected 2 each)`
+  );
+}
+
+const idxJulAug = cleared.findIndex((t) => t.date >= "2026-07-01");
+const idxJun30 = cleared.findIndex((t) => t.date === "2026-06-30");
+if (idxJulAug < 0 || idxJun30 < 0 || idxJulAug > idxJun30) {
+  failures++;
+  console.log("July/August rows must sit above 2026-06-30 in newest-first order");
+}
+
+let prev = null;
+for (let i = cleared.length - 1; i >= 0; i--) {
+  const t = cleared[i];
+  if (prev && Math.abs(t.balanceBefore - prev.balanceAfter) > 0.001) {
+    failures++;
+    console.log(`MISMATCH chain at ${t.id}: before ${t.balanceBefore} != prev ${prev.balanceAfter}`);
+  }
+  if (Math.abs(t.balanceBefore - (t.balanceAfter - t.amount)) > 0.001) {
+    failures++;
+    console.log(`MISMATCH before/after at ${t.id}`);
+  }
+  prev = t;
+}
+
+const tflCount = cleared.filter((t) => t.merchant === "TFL - Transport for London").length;
+
+console.log(`cleared transactions: ${cleared.length}`);
+console.log(`pending transactions: ${pending.length}`);
+console.log(`account.balance: ${account.balance}`);
+console.log(`newest date: ${newest?.date} ${newest?.merchant}`);
+console.log(`TFL rows: ${tflCount}`);
+console.log(`credits: ${credits.length}`);
+console.log(`Bangladesh cleared: ${bangladesh?.amount} on ${bangladesh?.date}`);
+console.log(`Nazneen credit: ${nazneen?.amount} on ${nazneen?.date}`);
+
+console.log(failures === 0 ? "ALL CHECKS PASS ✓" : `${failures} FAILURES`);
+if (failures !== 0) process.exit(1);
