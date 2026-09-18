@@ -62,6 +62,7 @@ const categoryByMerchant: Record<string, Category> = {
   "Bank credit J SAINSBURYS PLC 5750742-1": "salary",
   "Bank credit MR M A BATEN": "transfer",
   "Bank credit NAZNEEN Q 15": "transfer",
+  "Bank credit QAISER NAZNEEN": "transfer",
   "QAISER NAZNEEN 20": "transfer",
   "Bangladesh High Commission": "transfer",
   Grok: "subscription",
@@ -307,6 +308,7 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // Bangladesh High Commission cleared on 1 Jul, the day after it
 // was pending.
 const rawCleared: [string, string, number][] = [
+  ["2026-09-18", "Bank credit QAISER NAZNEEN", 1075.0],
   ["2026-09-16", "Bank credit J SAINSBURYS PLC 5750742-1", 1068.0],
   ["2026-09-02", "Top Dixie Chicken", -6.0],
   ["2026-09-02", "TFL - Transport for London", -3.8],
