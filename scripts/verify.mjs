@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 3199.35;
+const expectedAccountBalance = 192.35;
 const excluded = [
   "uber",
   "deliveroo",
@@ -79,13 +79,19 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 if (
   !newest ||
   newest.date !== "2026-09-18" ||
-  newest.merchant !== "Bank credit QAISER NAZNEEN" ||
-  Math.abs(newest.amount - 1075) > 0.001
+  newest.merchant !== "UKVI" ||
+  Math.abs(newest.amount + 3007) > 0.001
 ) {
   failures++;
   console.log(
-    `WRONG newest row: expected +1075 QAISER NAZNEEN on 2026-09-18, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`
+    `WRONG newest row: expected UKVI -3007 on 2026-09-18, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`
   );
+}
+
+const qaiser = cleared.find((t) => t.merchant === "Bank credit QAISER NAZNEEN");
+if (!qaiser || qaiser.date !== "2026-09-18" || Math.abs(qaiser.amount - 1075) > 0.001) {
+  failures++;
+  console.log("MISSING/WRONG QAISER NAZNEEN credit (expected +1075 on 2026-09-18)");
 }
 
 const laziz = cleared.find((t) => t.merchant === "Laziz Biriyani");
@@ -114,7 +120,8 @@ for (const t of cleared.filter((x) => x.date >= "2026-08-17")) {
   if (
     t.amount < -6 &&
     t.merchant !== "TFL - Transport for London" &&
-    t.merchant !== "Barber King"
+    t.merchant !== "Barber King" &&
+    t.merchant !== "UKVI"
   ) {
     failures++;
     console.log(`OVER-£6 non-TfL row present: ${t.merchant} ${t.amount} (${t.date})`);
