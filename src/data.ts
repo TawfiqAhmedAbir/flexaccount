@@ -307,6 +307,7 @@ const metaByMerchant: Record<string, MerchantMeta> = {
 // Bangladesh High Commission cleared on 1 Jul, the day after it
 // was pending.
 const rawCleared: [string, string, number][] = [
+  ["2026-09-16", "Bank credit J SAINSBURYS PLC 5750742-1", 1068.0],
   ["2026-09-02", "Top Dixie Chicken", -6.0],
   ["2026-09-02", "TFL - Transport for London", -3.8],
   ["2026-09-01", "Laziz Biriyani", -4.0],

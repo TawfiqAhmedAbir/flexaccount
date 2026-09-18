@@ -12,7 +12,7 @@ const { transactions, account } = await import(
   `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`
 );
 
-const expectedAccountBalance = 1056.35;
+const expectedAccountBalance = 2124.35;
 const excluded = [
   "uber",
   "deliveroo",
@@ -78,12 +78,12 @@ if (!nazneen || Math.abs(nazneen.amount - 500) > 0.001 || nazneen.date !== "2026
 
 if (
   !newest ||
-  newest.date !== "2026-09-02" ||
-  newest.merchant !== "Top Dixie Chicken" ||
-  Math.abs(newest.amount + 6) > 0.001
+  newest.date !== "2026-09-16" ||
+  newest.merchant !== "Bank credit J SAINSBURYS PLC 5750742-1" ||
+  Math.abs(newest.amount - 1068) > 0.001
 ) {
   failures++;
-  console.log(`WRONG newest row: expected Top Dixie -6 on 2026-09-02, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
+  console.log(`WRONG newest row: expected salary +1068 on 2026-09-16, got ${newest?.merchant} ${newest?.amount} on ${newest?.date}`);
 }
 
 const laziz = cleared.find((t) => t.merchant === "Laziz Biriyani");
